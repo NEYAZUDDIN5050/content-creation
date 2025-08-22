@@ -7,6 +7,7 @@ ContentApproval is a streamlined web application designed for the submission, re
 ![Signup](frontend/public/Signup.png)
 ![Submit Content](frontend/public/SubmitContent.png)
 
+![Test Image](frontend/public/AdminPanel.png)
 
 
 Features
