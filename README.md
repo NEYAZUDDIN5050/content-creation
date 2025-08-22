@@ -2,10 +2,10 @@ ContentApproval Project
 ContentApproval is a streamlined web application designed for the submission, review, and approval of content. It offers a simple interface for users to submit new content and allows administrators to manage all submissions through various approval stages. Below you'll find details about the project's features, functionality, and visual walkthroughs.
 ## Project Screenshots
 
-![User Dashboard](public/Screenshot%202025-08-22%20100925.png)
-![Submit Content](public/Screenshot%202025-08-22%20100925.png)
-![Admin Login](public/Screenshot%202025-08-22%20100925.png)
-![Admin Dashboard](public/Screenshot%202025-08-22%20100925.png)
+![Admin Panel](public/AdminPanel.png)
+![Dashboard](public/Dashboard.png)
+![Signup](public/Signup.png)
+![Submit Content](public/SubmitContent.png)
 
 
 Features
