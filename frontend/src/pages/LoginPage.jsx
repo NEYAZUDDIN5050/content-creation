@@ -20,18 +20,42 @@ const LoginPage = () => {
     e.preventDefault();
     setError('');
     setLoading(true);
+
+    // Basic validation
+    if (!email || !password) {
+      setError('Please fill in all fields');
+      setLoading(false);
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      setLoading(false);
+      return;
+    }
+
     try {
       await login(email, password);
     } catch (err) {
-      setError('Invalid credentials. Please try again.');
-      console.error(err);
+      // More detailed error handling
+      if (err.response && err.response.data && err.response.data.msg) {
+        setError(err.response.data.msg);
+      } else if (err.message) {
+        setError(err.message);
+      } else {
+        setError('Invalid credentials. Please try again.');
+      }
+      console.error('Login error:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (isAuthenticated) {
-    return user.role === 'admin' ? <Navigate to="/admin" /> : <Navigate to="/dashboard" />;
+  // Handle redirection after successful login
+  if (isAuthenticated && user) {
+    return user.role === 'admin' ? <Navigate to="/admin" replace /> : <Navigate to="/dashboard" replace />;
   }
 
   return (
@@ -68,18 +92,19 @@ const LoginPage = () => {
               htmlFor="email"
               className="block text-indigo-700 text-sm font-semibold mb-1"
             >
-              Email
+              Email Address
             </label>
             <input
               id="email"
               type="email"
               autoComplete="email"
-              placeholder="example@contentcreate.app"
+              placeholder="admin@example.com"
               name="email"
               value={email}
               onChange={onChange}
               required
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 text-gray-800 bg-indigo-50 outline-none transition"
+              disabled={loading}
             />
           </div>
 
@@ -94,27 +119,57 @@ const LoginPage = () => {
               id="password"
               type="password"
               autoComplete="current-password"
-              placeholder="********"
+              placeholder="Enter your password"
               name="password"
               value={password}
               onChange={onChange}
               required
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 text-gray-800 bg-indigo-50 outline-none transition"
+              disabled={loading}
             />
           </div>
 
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-gradient-to-br from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-semibold py-2 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-200 disabled:opacity-70"
+            disabled={loading || !email || !password}
+            className="w-full bg-gradient-to-br from-indigo-500 to-violet-500 hover:from-indigo-600 hover:to-violet-600 text-white font-semibold py-3 rounded-lg shadow-lg transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-indigo-200 disabled:opacity-50 disabled:transform-none disabled:cursor-not-allowed"
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            {loading ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Signing In...
+              </span>
+            ) : (
+              'Sign In'
+            )}
           </button>
         </form>
 
+        {/* Admin Quick Login (for development/testing) */}
+        {process.env.NODE_ENV === 'development' && (
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <p className="text-xs text-gray-600 mb-2">Quick Admin Login (Dev Mode):</p>
+            <button
+              type="button"
+              onClick={() => {
+                setFormData({
+                  email: 'admin@example.com',
+                  password: 'admin123'
+                });
+              }}
+              className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+            >
+              Fill Admin Credentials
+            </button>
+          </div>
+        )}
+
         {/* Signup Link */}
         <p className="text-center text-sm text-gray-600 mt-6">
-          Don’t have an account?{' '}
+          Don't have an account?{' '}
           <Link
             to="/signup"
             className="text-indigo-600 hover:text-indigo-800 font-semibold underline underline-offset-2 transition"
@@ -124,7 +179,7 @@ const LoginPage = () => {
         </p>
       </div>
 
-      {/* Same fade-in animation */}
+      {/* Styles */}
       <style>
         {`
           .animate-fadein {
